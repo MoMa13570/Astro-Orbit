@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="dark">
   <title>Astro Orbit Firmware Flasher</title>
-  <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+  <!-- Keep this pinned: 10.3/10.4 can fail while synchronising classic ESP32/CH340 boards. -->
+  <script type="module" src="https://unpkg.com/esp-web-tools@10.2.1/dist/web/install-button.js?module"></script>
   <style>
     :root{font-family:Inter,system-ui,sans-serif;color:#e9f3f0;background:#0c1113;--accent:#59d0aa}
     *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px}
