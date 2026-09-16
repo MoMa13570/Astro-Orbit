@@ -43,6 +43,11 @@ PlatformIO und zusätzliche Flash-Programme werden nicht benötigt.
 5. Den COM-Port des ESP32 auswählen und die Installation starten.
 6. Nach dem Neustart die WLAN-Einrichtung durchführen.
 
+Bei **Failed to initialize** zuerst N.I.N.A. und `AstroOrbit.LocalServer.exe`
+vollständig schließen. Falls es erneut fehlschlägt, BOOT gedrückt halten, die
+Installation starten, kurz EN/RESET drücken und BOOT nach erfolgreicher
+Verbindung loslassen.
+
 Für USB wird aus dem neuesten GitHub-Release automatisch
 `astro-orbit-factory.bin` verwendet.
 

@@ -16,7 +16,7 @@
     button,.button{display:inline-block;width:100%;border:0;border-radius:10px;padding:13px 16px;background:#267e65;color:white;font-weight:750;font-size:1rem;text-align:center;text-decoration:none;cursor:pointer;margin-top:12px}
     button:hover,.button:hover{background:#31977b}.secondary{background:#29373b}.secondary:hover{background:#35484d}
     ol{padding-left:1.25rem;line-height:1.65}.small{font-size:.9rem;color:#9cadaa}.status{min-height:1.5em;color:#8ce4c6}
-    code{color:#8ce4c6}esp-web-install-button{--esp-tools-button-color:#267e65;--esp-tools-button-text-color:#fff}
+    code{color:#8ce4c6}details{margin:14px 0;padding:10px 12px;background:#0f1618;border-radius:10px}summary{cursor:pointer;color:#8ce4c6;font-weight:700}esp-web-install-button{--esp-tools-button-color:#267e65;--esp-tools-button-text-color:#fff}
   </style>
 </head>
 <body><main>
@@ -24,7 +24,11 @@
     <p class="lead">Firmware ohne VS Code installieren. USB schreibt ein vollständiges Image; OTA aktualisiert einen bereits laufenden Astro-Orbit-Controller.</p></header>
   <div class="grid">
     <section class="card"><h2>USB installieren</h2>
-      <ol><li>Astro Orbit per USB anschließen.</li><li>Seriellen Monitor, NINA und andere COM-Programme schließen.</li><li>Auf „USB Firmware installieren“ klicken und den Port auswählen.</li></ol>
+      <ol><li>Astro Orbit per USB anschließen.</li><li>N.I.N.A., den seriellen Monitor und <code>AstroOrbit.LocalServer.exe</code> schließen.</li><li>Auf „USB Firmware installieren“ klicken und den Port auswählen.</li></ol>
+      <details><summary>Falls „Failed to initialize“ erscheint</summary>
+        <ol><li><b>BOOT</b> am ESP32 gedrückt halten.</li><li>Erneut auf Installieren klicken und den COM-Port wählen.</li><li>Während „Preparing installation“ kurz <b>EN/RESET</b> drücken.</li><li>BOOT loslassen, sobald die Verbindung hergestellt wurde.</li></ol>
+        <p class="small">Falls das Board keinen BOOT-Taster hat, GPIO 0 beim Reset kurz mit GND verbinden.</p>
+      </details>
       <p id="release" class="status">Neuestes GitHub-Release wird geladen …</p>
       <esp-web-install-button id="install" manifest="manifest.json">
         <button slot="activate">USB Firmware installieren</button>
