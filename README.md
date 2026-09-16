@@ -1,160 +1,144 @@
-> **USB, Windows-ASCOM und Browser-Flasher:** Anleitung in
-> [USB-ASCOM.md](USB-ASCOM.md), C#-Treiber in `windows/Driver`, Protokoll in
-> [USB-PROTOCOL.md](USB-PROTOCOL.md) und Web-Flasher in `firmware-flasher`.
+# Astro Orbit
 
-# Astro Orbit - ASCOM Alpaca Driver
+Astro Orbit ist ein astronomischer Bildfeldrotator auf Basis eines ESP32 und
+eines Feetech ST3215. Er lässt sich über USB, WLAN und einen normalen Browser
+steuern und unterstützt sowohl **ASCOM** als auch **ASCOM Alpaca**.
 
-Ein ASCOM Alpaca-kompatibler Treiber für einen astronomischen Bildfeldrotator.
-Verwendet ESP32 mit ST3215 Servo-Motor im Mode 3 (Motor Mode).
+## Funktionen
 
-## Projekt-Struktur
-
-### Hauptdateien
-
-#### `src/main.cpp` (79 Zeilen)
-Das schlanke Hauptprogramm enthält nur:
-- `setup()`: Initialisierung von Servo, WiFi, ALPACA Discovery und Web-Endpunkten
-- `loop()`: Feedback-Updates, DNS-Verarbeitung und Discovery-Handling
-- Keine Handler-Funktionen mehr - alles ist in dedizierte Module ausgelagert
-
-#### `include/alpaca_handlers.h` & `src/alpaca_handlers.cpp`
-Alle ASCOM Alpaca API-Endpunkte:
-- **Management Endpoints**: `/management/v1/description`, `/management/apiversions`, `/management/v1/configureddevices`
-- **Common Device Endpoints**: `/api/v1/rotator/0/connected`, `/api/v1/rotator/0/driverinfo`, etc.
-- **Rotator Specific Endpoints**: `/api/v1/rotator/0/position`, `/api/v1/rotator/0/move`, `/api/v1/rotator/0/halt`, etc.
-- **UDP Discovery**: Alpaca-Discovery-Protocol für automatische Geräteerkennung
-
-#### `include/wifi_manager.h` & `src/wifi_manager.cpp`
-WiFi und Setup-Verwaltung (optimiert aus parkplatz/CONNECT.h):
-- WiFi-Verbindung mit gespeicherten Credentials
-- Access Point Modus als Fallback
-- Captive Portal für einfache Konfiguration
-- Setup-Webseiten: `/setup/v1/rotator/0/setup`, `/setup/v1/rotator/0/wifi`
-- Control Panel: `/setup/v1/rotator/0/configdevices`
-- Kommando-Handler für Rotator-Steuerung: `/cmd`, `/position`, `/printip`
-
-#### `include/servo_control.h` & `src/servo_control.cpp`
-Servo-Motor-Steuerung (optimiert aus parkplatz/CONNECT.h):
-- Initialisierung des ST3215 Servos
-- Automatische Motor-ID Erkennung (scannt ID 0-10)
-- Bewegungsfunktionen: `moveServoToAngle()`, `moveServoByAngle()`
-- Reverse-Funktion: Kehrt Bewegungsrichtung um (negiert Delta)
-- Kalibrierung: `setZeroPointExact()`, `setMiddle()`
-- Feedback und Status: `getFeedback()`, `isServoMoving()`, `getServoAngle()`
-- Geschwindigkeits-Management: `setActiveSpeed()`, `getActiveSpeed()`
-
-#### `include/display_control.h` & `src/display_control.cpp`
-OLED Display-Steuerung (optimiert aus parkplatz/BOARD_DEV.h):
-- SSD1306 128x32 OLED Display (I2C 0x3C)
-- Auto-Update alle 300ms mit Motor-Informationen
-- Anzeige: Titel, Motor-ID, Mode, Position, IP-Adresse
-- Display On/Off Steuerung via Web-Interface
-- Status-Nachrichten während Initialisierung
-
-## Wichtige Features
-
-### Motor-Mode (3) Exclusive
-- **Mode**: Ausschließlich Motor-Mode (3) - keine Positions-Servofunktion
-- **Auto-ID Detection**: Automatisches Scannen und Erkennen der Motor-ID (0-10)
-- **Virtuelle Positionierung**: Position wird in Software verwaltet (keine Hardware-Kalibrierung)
-
-### Reverse-Funktion
-- **Richtungsumkehr**: Kehrt die Bewegungsrichtung um
-- **Beispiel**: Position 0°, Ziel 45° → Normal: +1024 steps, Reverse: -1024 steps
-- **Verwendung**: Umgehen mechanischer Hindernisse im astronomischen Setup
-
-### Gear Ratio Berechnung
-- **Übersetzung**: 1:2 (70 zu 140 Zähne)
-- **Formel**: `motorSteps = (gearDegrees * 2.0 / 360.0) * 4096`
-- **Winkelbereich**: 0 - 359.99° (Getriebe-Position)
-
-### ALPACA-Kompatibilität
-- **Interface Version**: 3
-- **API Version**: 1
-- **Device Type**: Rotator
-- **Discovery**: UDP Multicast auf Port 32227
-- **HTTP Server**: Port 80
-
-### WiFi Modi
-1. **STA Mode**: Verbindung zu bekanntem WLAN
-2. **AP Mode**: Fallback als Access Point "Astro Orbit"
-3. **Captive Portal**: Automatische Umleitung zur Konfiguration
-
-## Verwendung
-
-### Erste Inbetriebnahme
-1. ESP32 mit Strom versorgen
-2. Nach "Astro Orbit" WLAN suchen und verbinden
-3. Browser öffnet automatisch Setup-Seite (oder zu 192.168.1.1)
-4. WiFi-Einstellungen konfigurieren
-5. Nach Neustart verbindet sich das Gerät mit dem WLAN
-
-### ALPACA Discovery
-ASCOM-kompatible Software findet das Gerät automatisch über:
-- UDP Discovery auf Port 32227
-- ALPACA API auf Port 80
-
-### Web Interface
-- **Setup**: `http://<IP>/setup/v1/rotator/0/setup`
-- **WiFi Config**: `http://<IP>/setup/v1/rotator/0/wifi`
-- **Rotator Control**: `http://<IP>/setup/v1/rotator/0/configdevices`
-- **Firmware-Update**: `http://astro-orbit.local/update`
-
-### Firmware ohne VS Code
-- **USB**: `firmware-flasher/index.html` über GitHub Pages in Chrome oder Edge
-- **OTA**: `astro-orbit-firmware.bin` auf der Firmware-Update-Seite auswählen
-- **Release-Dateien bauen**: `./scripts/build_firmware_release.sh`
-
-### Rotator-Steuerung
-- **Position anfahren**: 0-359.99° via Web-Interface oder ALPACA API
-- **Geschwindigkeit**: +/- Buttons (100 Steps pro Klick, Min: 100, Max: 4000)
-- **Reverse**: Kehrt Bewegungsrichtung um (z.B. +45° wird zu -45°)
-- **Kalibrierung**: "Set Middle" oder "Set Zero"
-- **Stop**: Sofortiger Halt jederzeit möglich
-- **Display**: On/Off Steuerung des OLED-Displays
-
-## Entwickler-Informationen
-
-### Modulare Struktur
-Die neue Struktur trennt klar zwischen:
-- **Hauptlogik** (main.cpp): Minimales Setup und Loop
-- **ALPACA Protocol** (alpaca_handlers): Alle API-Endpunkte
-- **WiFi Management** (wifi_manager): Verbindung und Setup-Seiten
-- **Servo Control** (servo_control): Hardware-nahe Steuerung
-
-### Vorteile
-- ✅ Übersichtlicher Code (79 Zeilen main.cpp statt 630)
-- ✅ Klare Verantwortlichkeiten
-- ✅ Einfache Wartung und Erweiterung
-- ✅ Wiederverwendbare Module
-- ✅ Optimierte Funktionen aus parkplatz-Prototyp übernommen
+- Positionsbereich von 0 bis 360°
+- Feetech ST3215 im Motor-Modus mit 2:1-Riemenübersetzung
+- Native ASCOM-USB-Verbindung für Windows und N.I.N.A.
+- ASCOM Alpaca über WLAN
+- Steuerung über eine integrierte Weboberfläche
+- Position anfahren, stoppen, Richtung umkehren und Geschwindigkeit einstellen
+- Mechanische und astronomische Position auf 0° setzen
+- Persistente mechanische Position über Controller-Neustarts hinweg
+- OLED-Anzeige für Position, Motorstatus und IP-Adresse
+- Firmware-Installation über USB im Browser
+- Weitere Firmware-Updates über WLAN und Browser
 
 ## Hardware
 
-- **Mikrocontroller**: ESP32
-- **Servo**: Feetech ST3215 (Mode 3 - Motor Mode)
-- **Communication**: UART (Serial1, RX=18, TX=19, 1MBaud)
-- **Display**: SSD1306 OLED 128x32 (I2C 0x3C, SDA=21, SCL=22)
-- **Gear Ratio**: 1:2
+- ESP32 Dev Module
+- Feetech ST3215
+- Servo-Bus: 1 Mbit/s, RX GPIO 18, TX GPIO 19
+- SSD1306 OLED 128 × 32, I²C-Adresse `0x3C`
+- I²C: SDA GPIO 21, SCL GPIO 22
+- Riemenscheiben: 70 zu 140 Zähne, Übersetzung 2:1
 
-## Abhängigkeiten
+## Firmware installieren
 
-- ESPAsyncWebServer
-- WiFi (ESP32)
-- DNSServer
-- Preferences (ESP32)
-- ArduinoJson
-- SMS_STS (Servo-Bibliothek)
-- Adafruit_SSD1306 (OLED Display)
-- Adafruit_GFX (Graphics Library)
+### USB mit Chrome oder Edge
 
-## Version
+Der Web-Flasher installiert ein vollständiges Firmware-Image. VS Code,
+PlatformIO und zusätzliche Flash-Programme werden nicht benötigt.
 
-- **Firmware Version**: 1.3.0-usb
-- **ASCOM Driver Version**: 1.4.2
-- **Interface Version**: 3 (ALPACA)
-- **Manufacturer**: Astro Orbit
+**[Astro Orbit Web-Flasher öffnen](https://moma13570.github.io/Astro-Orbit/)**
 
-## Autor
+1. Astro Orbit per USB mit dem Computer verbinden.
+2. N.I.N.A., serielle Monitore und andere Programme schließen, die den COM-Port verwenden.
+3. Den Web-Flasher in Chrome oder Edge öffnen.
+4. **USB Firmware installieren** wählen.
+5. Den COM-Port des ESP32 auswählen und die Installation starten.
+6. Nach dem Neustart die WLAN-Einrichtung durchführen.
 
-geo - 2026
+Für USB wird aus dem neuesten GitHub-Release automatisch
+`astro-orbit-factory.bin` verwendet.
+
+### OTA über WLAN
+
+OTA steht zur Verfügung, sobald Firmware 1.3.0 oder neuer installiert ist.
+
+1. `astro-orbit-firmware.bin` aus dem
+   **[neuesten Release](https://github.com/MoMa13570/Astro-Orbit/releases/latest)** herunterladen.
+2. Mit demselben Netzwerk wie Astro Orbit verbinden.
+3. `http://astro-orbit.local/update` öffnen.
+4. Die heruntergeladene Datei auswählen und hochladen.
+5. Strom und WLAN bis zum automatischen Neustart nicht trennen.
+
+Falls der Hostname nicht erreichbar ist, kann die Update-Seite über
+`http://<IP-Adresse>/update` geöffnet werden.
+
+## WLAN und Websteuerung
+
+Beim ersten Start öffnet Astro Orbit einen WLAN-Zugangspunkt mit dem Namen
+**Astro Orbit**. Damit verbinden und im Captive Portal das eigene WLAN auswählen.
+Nach dem Neustart verbindet sich der Controller mit diesem Netzwerk.
+
+Die wichtigsten Seiten sind:
+
+| Funktion | Adresse |
+| --- | --- |
+| Rotator steuern | `http://astro-orbit.local/setup/v1/rotator/0/configdevices` |
+| WLAN einrichten | `http://astro-orbit.local/setup/v1/rotator/0/wifi` |
+| Firmware aktualisieren | `http://astro-orbit.local/update` |
+
+Alternativ kann überall die im OLED angezeigte IP-Adresse verwendet werden.
+
+## ASCOM unter Windows
+
+Der native ASCOM-Treiber verbindet N.I.N.A. und andere Windows-Astroprogramme
+direkt per USB mit Astro Orbit. Ein zusätzlicher ASCOM-Hub wird nicht benötigt.
+
+Voraussetzungen:
+
+- Windows 10 oder 11
+- ASCOM Platform 7.1 oder neuer
+- .NET Framework 4.8 oder neuer
+
+Installation:
+
+1. Sobald der Windows-Installer in einem
+   **[Release](https://github.com/MoMa13570/Astro-Orbit/releases)** bereitsteht,
+   die Datei `Astro-Orbit-ASCOM-Setup-<Version>.exe` herunterladen.
+2. N.I.N.A. und andere Astroprogramme schließen.
+3. Das Setup als Administrator ausführen.
+4. In N.I.N.A. als Rotator **Astro Orbit** auswählen.
+5. Über das Zahnrad den COM-Port festlegen.
+6. Zum Nullen im selben Fenster **Set current position to 0°** verwenden. Der
+   Treiber verbindet den ausgewählten COM-Port dafür kurz selbstständig.
+7. Astro Orbit verbinden und zunächst eine kleine Bewegung testen.
+
+Der ASCOM-Treiber stellt Position, mechanische Position, Zielposition,
+`IsMoving`, `Reverse`, `Move`, `MoveAbsolute`, `MoveMechanical`, `Sync` und
+`Halt` bereit.
+
+Eine ausführliche Anleitung für Entwickler und den Windows-Build steht in
+[USB-ASCOM.md](USB-ASCOM.md).
+
+## ASCOM Alpaca über WLAN
+
+Astro Orbit stellt einen Alpaca-Rotator der Interface-Version 3 über HTTP-Port
+80 bereit. In N.I.N.A. oder einem anderen Alpaca-Client wird die IP-Adresse des
+Controllers und die Gerätenummer `0` verwendet.
+
+1. Computer und Astro Orbit mit demselben Netzwerk verbinden.
+2. In der Astrosoftware einen ASCOM-Alpaca-Rotator hinzufügen.
+3. `astro-orbit.local` oder die angezeigte IP-Adresse eintragen.
+4. Port `80`, Gerätetyp `Rotator` und Gerätenummer `0` verwenden.
+5. Verbinden und eine kleine Testbewegung ausführen.
+
+USB-ASCOM und Alpaca sollten nicht gleichzeitig Bewegungsbefehle senden. Während
+einer aktiven USB-Sitzung sperrt die Firmware andere schreibende Zugriffe.
+
+## Position und Nullen
+
+- **Mechanical Position** ist die virtuelle mechanische Stellung des Rotators.
+- **Position** enthält zusätzlich den über ASCOM `Sync` gesetzten astronomischen Offset.
+- Die mechanische Position bleibt über Neustarts hinweg gespeichert.
+- Der Nullknopf setzt mechanische Position, Position und Zielposition gemeinsam auf 0°.
+- `Sync` ändert nur die astronomische Positionszuordnung und bewegt den Motor nicht.
+
+## Downloads
+
+- **[Firmware und Releases](https://github.com/MoMa13570/Astro-Orbit/releases)**
+- **[Web-Flasher](https://moma13570.github.io/Astro-Orbit/)**
+- [USB-/ASCOM-Details](USB-ASCOM.md)
+- [USB-Protokoll](USB-PROTOCOL.md)
+
+## Aktuelle Versionen
+
+- Firmware: **1.3.0-usb**
+- ASCOM-Treiber: **1.4.2**
+- Alpaca Interface: **3**
