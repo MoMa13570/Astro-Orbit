@@ -1,0 +1,2 @@
+ba8d0f3363eeb6cd6129e8a7992dafa4c0bce63d13724730269beff5eceda869  astro-orbit-factory.bin
+9955f924410a590e7f49e23bf4268ff12fe0df2e44279f7cd1bce5911e442e8e  astro-orbit-firmware.bin

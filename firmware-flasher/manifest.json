@@ -1,0 +1,16 @@
+{
+  "name": "Astro Orbit",
+  "version": "latest",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "path": "https://github.com/MoMa13570/Astro-Orbit/releases/latest/download/astro-orbit-factory.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
