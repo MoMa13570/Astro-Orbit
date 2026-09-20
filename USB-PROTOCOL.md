@@ -38,6 +38,7 @@ Example (use fresh random IDs and a fresh session token in real clients):
 | `move` | number, -360 ≤ x ≤ 360 | relative move preserving direction and full turns |
 | `sync` | number, 0 ≤ x < 360 | set sky offset without moving |
 | `reverse` | JSON boolean | set motor direction reversal |
+| `speed` | integer, 100 ≤ x ≤ 4000 | set the ST3215 movement speed |
 | `halt` | none | call existing motor stop function |
 
 Except Hello and Connect, every command requires the current session token.
@@ -47,7 +48,7 @@ and invalid values never dispatch to the motor. Mutations other than Halt and
 Disconnect require the motor to be idle. Movement and Sync require recent valid
 motor feedback. All sessions use the same firmware sky offset and target position.
 
-Status fields: `position`, `mechanical`, `target`, `stepSize` (degrees), `moving`,
+Status fields: `position`, `mechanical`, `target`, `stepSize` (degrees), `speedSetting`, `moving`,
 `reverse`, `motorHealthy` (booleans), `motionError` (string, empty if no motion fault).
 `target` always uses sky coordinates, including after a mechanical move.
 

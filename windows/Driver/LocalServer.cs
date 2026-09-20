@@ -50,7 +50,7 @@ namespace MoMaRoTa
                 {
                     int resumeResult = RotatorClassFactory.CoResumeClassObjects();
                     if (resumeResult < 0) Marshal.ThrowExceptionForHR(resumeResult);
-                    Log("Official ASCOM server model 1.4.3 x86 ready, process " + System.Diagnostics.Process.GetCurrentProcess().Id);
+                    Log("Official ASCOM server model 1.4.4 x86 ready, process " + System.Diagnostics.Process.GetCurrentProcess().Id);
                     var garbageCollection = new System.Windows.Forms.Timer { Interval = 10000 };
                     garbageCollection.Tick += (_, __) => GC.Collect();
                     garbageCollection.Start();

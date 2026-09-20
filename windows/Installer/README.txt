@@ -1,4 +1,4 @@
-Astro Orbit 1.4.3 - USB ASCOM Rotator
+Astro Orbit 1.4.4 - USB ASCOM Rotator
 
 Voraussetzungen auf dem Ziel-PC:
 - Windows x64 (erster Hardwaretest vorgesehen auf Windows 11 x64)

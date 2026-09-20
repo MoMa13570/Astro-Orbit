@@ -101,9 +101,10 @@ Installation:
 3. Das Setup als Administrator ausführen.
 4. In N.I.N.A. als Rotator **Astro Orbit** auswählen.
 5. Über das Zahnrad den COM-Port festlegen.
-6. Zum Nullen im selben Fenster **Set current position to 0°** verwenden. Der
+6. Im selben Fenster die Motorgeschwindigkeit zwischen **100 und 4000** einstellen.
+7. Zum Nullen im selben Fenster **Set current position to 0°** verwenden. Der
    Treiber verbindet den ausgewählten COM-Port dafür kurz selbstständig.
-7. Astro Orbit verbinden und zunächst eine kleine Bewegung testen.
+8. Astro Orbit verbinden und zunächst eine kleine Bewegung testen.
 
 Der ASCOM-Treiber stellt Position, mechanische Position, Zielposition,
 `IsMoving`, `Reverse`, `Move`, `MoveAbsolute`, `MoveMechanical`, `Sync` und
@@ -144,6 +145,6 @@ einer aktiven USB-Sitzung sperrt die Firmware andere schreibende Zugriffe.
 
 ## Aktuelle Versionen
 
-- Firmware: **1.3.0-usb**
-- ASCOM-Treiber: **1.4.3**
+- Firmware: **1.3.1-usb**
+- ASCOM-Treiber: **1.4.4**
 - Alpaca Interface: **3**

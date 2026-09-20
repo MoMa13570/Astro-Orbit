@@ -16,8 +16,8 @@ internal static class Program
             driver = Activator.CreateInstance(Type.GetTypeFromProgID("ASCOM.MoMaRoTa.Rotator", true));
             Console.WriteLine("Client runtime: " + RuntimeInformation.FrameworkDescription);
             Console.WriteLine("Name: " + driver.Name + ", driver " + driver.DriverVersion + ", interface " + driver.InterfaceVersion);
-            if (driver.DriverVersion != "1.4.3" || driver.InterfaceVersion != 3)
-                throw new InvalidOperationException("Install Astro Orbit 1.4.3 and restart the server first.");
+            if (driver.DriverVersion != "1.4.4" || driver.InterfaceVersion != 3)
+                throw new InvalidOperationException("Install Astro Orbit 1.4.4 and restart the server first.");
             if (!Marshal.IsComObject((object)driver)) throw new InvalidOperationException("Expected COM wrapper.");
             if (Array.Exists(args, item => item == "--connect"))
             {

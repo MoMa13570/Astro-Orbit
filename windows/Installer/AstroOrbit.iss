@@ -1,6 +1,6 @@
 ﻿; Compile with Inno Setup 6 on Windows (Build-Installer.ps1).
 #ifndef AppVersion
-  #define AppVersion "1.4.3"
+  #define AppVersion "1.4.4"
 #endif
 #define DriverDir "..\Driver\bin\Release\net48"
 #define DriverExe "AstroOrbit.LocalServer.exe"

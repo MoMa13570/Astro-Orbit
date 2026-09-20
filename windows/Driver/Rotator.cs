@@ -54,6 +54,8 @@ namespace MoMaRoTa
                         protocol.Handshake();
                         RotatorStatus.Parse(protocol.Exchange("connect"));
                         protocol.Exchange("reverse", Settings.Reverse);
+                        try { protocol.Exchange("speed", Settings.Speed); }
+                        catch (DeviceError ex) when (ex.Code == 1024) { LocalServer.Log("Controller firmware does not support USB speed control yet."); }
                         connectionFault = null;
                         heartbeat = new Timer(HeartbeatTick, new WeakReference(this), 2000, 2000);
                     }
@@ -158,8 +160,8 @@ namespace MoMaRoTa
 
         public string Name => DisplayName;
         public string Description => "Astro Orbit ESP32 / ST3215 USB field rotator";
-        public string DriverInfo => "Astro Orbit ASCOM LocalServer 1.4.3 x86; USB protocol 1; 115200 baud; ASCOM Rotator V3. Persistent mechanical position and zero control in Setup.";
-        public string DriverVersion => "1.4.3";
+        public string DriverInfo => "Astro Orbit ASCOM LocalServer 1.4.4 x86; USB protocol 1; 115200 baud; ASCOM Rotator V3. Speed, persistent position and zero control in Setup.";
+        public string DriverVersion => "1.4.4";
         public short InterfaceVersion => 3;
         public ArrayList SupportedActions => new ArrayList { "ZeroPosition" };
         public bool CanReverse { get { lock (gate) { RequireConnected(); return true; } } }
@@ -179,6 +181,7 @@ namespace MoMaRoTa
         public void Sync(float Position) { LocalServer.Log("Sync " + Position.ToString(CultureInfo.InvariantCulture)); Validate(Position, false); Request("sync", Position); }
         public void Halt() { LocalServer.Log("Halt"); Request("halt"); }
         private void ZeroPosition() { LocalServer.Log("ZeroPosition"); Request("zero"); }
+        private void ApplySpeed(int speed) { LocalServer.Log("Speed " + speed); Request("speed", speed); }
         private void ZeroPositionFromSetup(string portName, bool alreadyConnected)
         {
             if(alreadyConnected) { ZeroPosition(); return; }
@@ -212,19 +215,20 @@ namespace MoMaRoTa
             bool connected;
             lock(gate) connected = protocol != null && connectionFault == null;
             Action<string> zero = portName => ZeroPositionFromSetup(portName, connected);
+            Action<int> speed = value => ApplySpeed(value);
             LocalServer.Log("SetupDialog entered on " + Thread.CurrentThread.GetApartmentState() + " thread");
                 // LocalServer COM calls already arrive on its STA message-loop
                 // thread. Showing the dialog there keeps COM messages pumping.
                 if (Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
                 {
-                    using (var dialog = new SetupDialog(zero, connected)) dialog.ShowDialog();
+                    using (var dialog = new SetupDialog(zero, speed, connected)) dialog.ShowDialog();
                     LocalServer.Log("SetupDialog closed");
                     return;
                 }
                 // Retain compatibility if a host ever invokes this from MTA.
                 Exception error = null;
                 var thread = new Thread(() => {
-                    try { using (var dialog = new SetupDialog(zero, connected)) dialog.ShowDialog(); }
+                    try { using (var dialog = new SetupDialog(zero, speed, connected)) dialog.ShowDialog(); }
                     catch (Exception ex) { error = ex; }
                 });
                 thread.SetApartmentState(ApartmentState.STA); thread.Start(); thread.Join();

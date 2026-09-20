@@ -46,6 +46,7 @@ static void status(JsonDocument& r) {
     v["target"] = rotatorTarget();
     v["moving"] = isServoMoving();
     v["reverse"] = getReverseDirection();
+    v["speedSetting"] = getActiveSpeed();
     v["stepSize"] = 360.0 / 4096.0 / 2.0;
     v["motorHealthy"] = isServoFeedbackHealthy();
     v["motionError"] = getServoMotionError();
@@ -64,7 +65,7 @@ void executeUsbRotator(JsonDocument& q, JsonDocument& r) {
         JsonObject v = r["value"].to<JsonObject>();
         v["device"] = "MoMaRoTa";
         v["protocol"] = 1;
-        v["firmware"] = "1.3.0-usb";
+        v["firmware"] = "1.3.1-usb";
         v["leaseMs"] = LeaseMs;
         return;
     }
@@ -108,6 +109,13 @@ void executeUsbRotator(JsonDocument& q, JsonDocument& r) {
     if(cmd == "reverse") {
         if(!q["value"].is<bool>()) { fail(r, 1025, "Reverse requires a boolean"); return; }
         setReverseDirection(q["value"].as<bool>());
+        return;
+    }
+    if(cmd == "speed") {
+        if(!q["value"].is<int>()) { fail(r, 1025, "Speed requires an integer"); return; }
+        const int speed = q["value"].as<int>();
+        if(speed < 100 || speed > 4000) { fail(r, 1025, "Speed outside allowed range 100..4000"); return; }
+        setActiveSpeed(speed);
         return;
     }
     if(cmd != "move" && cmd != "absolute" && cmd != "mechanical" && cmd != "sync") {
