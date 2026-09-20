@@ -145,5 +145,5 @@ einer aktiven USB-Sitzung sperrt die Firmware andere schreibende Zugriffe.
 ## Aktuelle Versionen
 
 - Firmware: **1.3.0-usb**
-- ASCOM-Treiber: **1.4.2**
+- ASCOM-Treiber: **1.4.3**
 - Alpaca Interface: **3**

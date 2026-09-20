@@ -158,8 +158,8 @@ namespace MoMaRoTa
 
         public string Name => DisplayName;
         public string Description => "Astro Orbit ESP32 / ST3215 USB field rotator";
-        public string DriverInfo => "Astro Orbit ASCOM LocalServer 1.4.2 x86; USB protocol 1; 115200 baud; ASCOM Rotator V3. Persistent mechanical position and zero control in Setup.";
-        public string DriverVersion => "1.4.2";
+        public string DriverInfo => "Astro Orbit ASCOM LocalServer 1.4.3 x86; USB protocol 1; 115200 baud; ASCOM Rotator V3. Persistent mechanical position and zero control in Setup.";
+        public string DriverVersion => "1.4.3";
         public short InterfaceVersion => 3;
         public ArrayList SupportedActions => new ArrayList { "ZeroPosition" };
         public bool CanReverse { get { lock (gate) { RequireConnected(); return true; } } }

@@ -15,11 +15,11 @@ NINA lädt dadurch keine Treiber-DLL mehr in seine eigene .NET-Laufzeit.
 Die LocalServer-Version muss noch auf Windows mit NINA und Hardware geprüft werden.
 Der USB-Verbindungs- und Lesetest der vorherigen Version 1.1 war auf Windows erfolgreich.
 
-### Update auf 1.4.2
+### Update auf 1.4.3
 
 NINA dokumentiert den Fehler `System.Runtime, Version=6.0.0.0` bei älteren
 In-Process-Treibern: [NINA – ASCOM Connection Issues](https://nighttime-imaging.eu/docs/master/site/troubleshooting/ascom_connection_issues/).
-Version 1.4.2 verwendet das vollständige Prozess-, Klassenfabrik- und
+Version 1.4.3 verwendet das vollständige Prozess-, Klassenfabrik- und
 Referenzzählungsmodell der offiziellen ASCOM-7-LocalServer-Vorlage. Wie die
 Vorlage wird die EXE als signierte x86-Assembly gebaut; als separater Prozess
 bleibt sie für 32- und 64-Bit-ASCOM-Clients erreichbar.
@@ -27,7 +27,7 @@ bleibt sie für 32- und 64-Bit-ASCOM-Clients erreichbar.
 1. Den vollständigen neuen `windows`-Ordner auf den Windows-PC übernehmen.
 2. NINA und andere Astroprogramme schließen. Einen verbliebenen Prozess
    `AstroOrbit.LocalServer.exe` im Task-Manager beenden.
-3. `Build-Installer.ps1` wie unten ausführen und die neue Setup-EXE **1.4.2** installieren.
+3. `Build-Installer.ps1` wie unten ausführen und die neue Setup-EXE **1.4.3** installieren.
    Die Registrierung ersetzt den alten DLL-Eintrag automatisch.
 4. NINA neu starten und **Astro Orbit** auswählen. COM-Port im Setup prüfen.
 
@@ -45,10 +45,10 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Build-Installer.ps1
 ```
 
 Das Skript führt den Treiber-Build einschließlich der Protokolltests aus und
-kompiliert anschließend den Installer. Ausgabe bei Version 1.4.2:
+kompiliert anschließend den Installer. Ausgabe bei Version 1.4.3:
 
 ```text
-windows\dist\Astro-Orbit-ASCOM-Setup-1.4.2.exe
+windows\dist\Astro-Orbit-ASCOM-Setup-1.4.3.exe
 ```
 
 **Diese einzelne EXE kannst du weitergeben.** Sie enthält Treiber und benötigte

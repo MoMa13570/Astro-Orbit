@@ -12,9 +12,9 @@ foreach ($view in $views) {
     $cls = $null; $inproc = $null; $server = $null
     try {
         $cls = $base.OpenSubKey('SOFTWARE\Classes\CLSID\{9BA3AC78-96AF-46D7-9976-E3F940DB8587}')
-        if ($null -eq $cls) { throw "Astro Orbit is not registered in $view. Install setup 1.4.2." }
+        if ($null -eq $cls) { throw "Astro Orbit is not registered in $view. Install setup 1.4.3." }
         $inproc = $cls.OpenSubKey('InprocServer32')
-        if ($null -ne $inproc) { throw "Old DLL registration in $view. Install setup 1.4.2 with NINA closed." }
+        if ($null -ne $inproc) { throw "Old DLL registration in $view. Install setup 1.4.3 with NINA closed." }
         $server = $cls.OpenSubKey('LocalServer32')
         if ($null -eq $server) { throw "Missing LocalServer32 in $view." }
         $serverPath = [string]$server.GetValue('ServerExecutable')
@@ -32,7 +32,7 @@ try {
     $driver = New-Object -ComObject 'ASCOM.MoMaRoTa.Rotator'
     Write-Host "Name: $($driver.Name), driver $($driver.DriverVersion), interface $($driver.InterfaceVersion)"
     if (-not [Runtime.InteropServices.Marshal]::IsComObject($driver)) { throw 'Expected an out-of-process COM wrapper.' }
-    if ($driver.DriverVersion -ne '1.4.2') { throw 'Old driver is still active. Close all Astro software, install 1.4.2 and retry.' }
+    if ($driver.DriverVersion -ne '1.4.3') { throw 'Old driver is still active. Close all Astro software, install 1.4.3 and retry.' }
     if ($driver.InterfaceVersion -ne 3) { throw 'Unexpected driver interface version.' }
     if ($Connect) {
         $driver.SetupDialog()

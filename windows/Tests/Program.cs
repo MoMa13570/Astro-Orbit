@@ -100,7 +100,8 @@ internal static class Program
         });
         Test("missing status field rejected", () => { var s = Status(); s.Remove("moving"); Throws<InvalidOperationException>(() => RotatorStatus.Parse(s)); });
         Test("nonfinite status rejected", () => { var s = Status(); s["position"] = double.NaN; Throws<InvalidOperationException>(() => RotatorStatus.Parse(s)); });
-        Test("out-of-range status rejected", () => { var s = Status(); s["mechanical"] = 360; Throws<InvalidOperationException>(() => RotatorStatus.Parse(s)); });
+        Test("legacy circular angles are normalized", () => { var s = Status(); s["mechanical"] = 360; s["position"] = -0.5;
+            var parsed = RotatorStatus.Parse(s); Assert(parsed.Mechanical == 0 && parsed.Position == 359.5f); });
         Test("motor failure stays visible", () => { var s = Status(); s["motionError"] = "Motor stalled"; s["motorHealthy"] = false;
             var parsed = RotatorStatus.Parse(s); Assert(parsed.MotionError == "Motor stalled" && !parsed.MotorHealthy); });
         Console.WriteLine($"{passed} protocol tests passed.");

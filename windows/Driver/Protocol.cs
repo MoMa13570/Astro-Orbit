@@ -111,7 +111,12 @@ namespace MoMaRoTa
         private static float Angle(JObject value, string name)
         {
             float angle = Number(value, name);
-            if (angle < 0 || angle >= 360) throw new InvalidOperationException("Invalid angle: " + name);
+            // Older controller firmware can report an equivalent, but not yet
+            // wrapped, circular coordinate (for example 360 or -0.5 degrees).
+            // ASCOM requires every absolute angle to be in the range [0, 360).
+            angle %= 360f;
+            if (angle < 0) angle += 360f;
+            if (angle >= 360f) angle = 0f; // Protect against float rounding.
             return angle;
         }
     }
